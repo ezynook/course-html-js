@@ -128,18 +128,23 @@ $.get("https://ipinfo.io/json", (data) => {
 });
 ```
 
-## ปรับใช้่กับ Function ทำงานทันทีเมื่อ Page Loaded
+## ปรับใช้กับ Function ทำงานทันทีเมื่อ Page Loaded
 
 ```javascript
-function getRegion () {
-    $.get("https://ipinfo.io/json", (data) => {
-        console.log(data);
-        var lang = data.country
-        if (lang == 'TH') {
-            $("#main").text("คลิกฉัน");
-        } else {
-            $("#main").text("Click Me!");
-        }
-    });
-}
+$(function () {
+
+    function getRegion () {
+        $.get("https://ipinfo.io/json", (data) => {
+            console.log(data);
+            var lang = data.country
+            if (lang == 'TH') {
+                $("#main").text("คลิกฉัน");
+            } else {
+                $("#main").text("Click Me!");
+            }
+        });
+    }
+    
+    getRegion();
+});
 ```
