@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
+    <link rel="stylesheet" href="https://pasitdev.com/sweetalert.css">
+    <link rel="stylesheet" href="https://pasitdev.com/alertify.css">
+    <link rel="stylesheet" href="https://pasitdev.com/theme/default.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <title>Document</title>
+</head>
+<body>
+    <div class="container mt-5 text-center">
+        <h1>Welcome to my Pages: <span class="badge bg-warning text-dark" id="username"></span></h1>  
+        <hr>
+        <div class="row">
+            <div class="col-3">
+                <input type="text" class="form-control" id="fname">
+            </div>
+            <div class="col-3">
+                <input type="text" class="form-control" id="lname">
+            </div>
+            <div class="col">
+                <button class="btn btn-primary" id="save">เพิ่มข้อมูล</button>
+            </div>
+        </div>
+        <hr>
+        <table class="table table-hover table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ชื่อ</th>
+                    <th>นามสกุล</th>
+                </tr>
+            </thead>
+            <tbody id="save_data">
+            </tbody>
+        </table>  
+    </div>
+<script src="https://pasitdev.com/jquery.js"></script>
+<script src="https://pasitdev.com/sweetalert.js"></script>
+<script src="https://pasitdev.com/alertify.js"></script>
+<script>
+    $(function() {
+        if (localStorage.getItem("username") === null) {
+            window.location.href = 'index.html';
+        } else {
+            $("#username").text(localStorage.getItem("username"));
+        }
+        $("#save").click(function() {
+            $("#save_data").append(
+                `
+                    <tr>
+                        <td class="w-25">${$("#fname").val()}</td>    
+                        <td>${$("#lname").val()}</td> 
+                        <td>
+                            <button class="btn btn-danger" id="delete"><i class="fa-solid fa-trash"></i></button>    
+                        </td> 
+                    </tr>
+                `
+            );
+        });
+        $(document).on("click", "#delete", function() {
+            alertify.confirm(
+                "ยืนยันการลบข้อมูล",
+                "กรุณายืนยัน",
+                () => {
+                    $(this).closest("tr").remove();
+                }, () => {}
+            );
+        });
+    });
+</script>
+</body>
+</html>

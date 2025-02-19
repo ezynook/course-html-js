@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1>เข้าสู่ระบบ</h1>
+            </div>
+            <div class="card-body">
+                <input type="text" name="username" class="form-control" id="username" placeholder="Username">
+                <input type="password" name="username" class="form-control mt-2" id="password" placeholder="Password">
+                <button type="submit" class="btn btn-primary mt-2" id="login">ล็๋อกอิน</button>
+            </div>
+        </div>
+    </div>
+<script src="https://pasitdev.com/jquery.js"></script>
+<script>
+    $(function() {
+
+        $("#login").click(function() {
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var true_username = ["first", "karn", "nook"];
+            var true_password = ["1234", "4321", "5678"];
+            if (true_username.includes(username) && true_password.includes(password)) {
+                localStorage.setItem("username", username);
+                window.location.href = 'home.html';
+            } else {
+                Swal.fire("Error", "", "error")
+                $("#username, #password").val("");
+            }
+        });
+
+        $("#username").keyup(function() {
+            var password = $("#password");
+            if (password.val() !== '') {
+                $("#login").removeClass("disabled");
+            } else {
+                $("#login").addClass("disabled");
+            }
+        });
+
+        $("#password").keyup(function() {
+            var username = $("#username");
+            if (username.val() !== '') {
+                $("#login").removeClass("disabled");
+            } else {
+                $("#login").addClass("disabled");
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
