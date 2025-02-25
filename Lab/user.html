@@ -6,33 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
     <script src="https://pasitdev.com/jquery.js"></script>
-    <script src="https://pasitdev.com/bootstrap.bundle.js"></script>
     <title>Home Page</title>
     <style>
         td {
             cursor: pointer;
-        }
-    </style>
-    <style>
-        @media print {
-            body * {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
-            .table-reponsive, .table-reponsive * {
-                visibility: visible; /* แสดงเฉพาะตาราง */
-            }
-            .table-reponsive {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            #btn-delete {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
-            #th-delete {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
         }
     </style>
 </head>
@@ -69,8 +46,7 @@
                 <h1>แสดงข้อมูลรถ</h1>
             </div>
             <div class="col" align="right">
-                <button id="btn-add" class="btn btn-success">เพิ่มรถ</button>
-                <button id="printBtn" class="btn btn-primary">Print</button>
+                <button id="btn-add-user" class="btn btn-primary">เพิ่มผู้ใช้</button>
             </div>
         </div>
         <hr>
@@ -78,8 +54,8 @@
             <table class="table table-sm" width="100%">
                 <thead>
                     <th>#</th>
-                    <th>ชื่อยี่ห้อ</th>
-                    <th>รุ่น</th>
+                    <th>ชื่อ-สกุล</th>
+                    <th>ชื่อผู้ใช้</th>
                     <th id="th-delete">ลบ</th>
                 </thead>
                 <tbody id="fetch_data"></tbody>
@@ -91,24 +67,31 @@
         $(function () {
             // Page Ready
             $("#login").text(localStorage.getItem("full_name"))
-            function getCar () {
-                $.post(BASEURL, {type: 'get'}, (data) => {
+            function getUser () {
+                $.post(BASEURL, {type: 'get-user'}, (data) => {
                     $("#fetch_data").empty();
                     $.each(data.data, function (key, value) { 
                          $("#fetch_data").append(`
                             <tr>
                                 <td width="10%">${value.id}</td>    
-                                <td id="edit-car" data-id="${value.id}" data-car="${value.car}" data-model="${value.model}">
-                                    ${value.car}
+                                <td 
+                                    id="edit-full_name" 
+                                    data-id="${value.id}" 
+                                    data-full_name="${value.name}" 
+                                    data-username="${value.username}">
+                                    ${value.name}
                                 </td>    
                                 <td 
-                                    id="edit-model" 
+                                    id="edit-username" 
                                     data-id="${value.id}" 
-                                    data-car="${value.car}" 
-                                    data-model="${value.model}">
-                                    ${value.model || '-'}
+                                    data-full_name="${value.name}" 
+                                    data-username="${value.username}">
+                                    ${value.username}
                                 </td>    
-                                <td width="10%">
+                                <td width="20%">
+                                    <button class="btn btn-outline-warning text-dark rounded-4" id="btn-password" data-id="${value.id}">
+                                        เปลี่ยนรหัสผ่าน    
+                                    </button>  
                                     <button class="btn btn-outline-danger rounded-4" id="btn-delete" data-id="${value.id}">
                                         ลบ    
                                     </button>  
@@ -118,58 +101,55 @@
                     });
                 });
             }
-            getCar();
-            $(document).on("click", "#edit-car", function (e) {
+            getUser();
+
+            $(document).on("click", "#edit-full_name", function (e) {
                 let id = $(this).data("id");
-                let car = $(this).data("car");
-                let model = $(this).data("model");
-                let edit = prompt("แก้ไขชื่อรถ", car);
+                let full_name = $(this).data("full_name");
+                let username = $(this).data("username");
+                let edit = prompt("แก้ไขชื่อสกุล", full_name);
                 let params = {
                     id: id,
-                    car: edit,
-                    model: model,
-                    type: 'edit'
+                    full_name: edit,
+                    username: username,
+                    type: 'edit-user'
                 }
-                if (edit && model) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
+                $.post(BASEURL, params, (data) => {
+                    if (data.message == 'success') {
+                        getUser();
+                    } else {
+                        console.log("Error");
+                    }
+                });
             });
-            $(document).on("click", "#edit-model", function (e) {
+            $(document).on("click", "#edit-username", function (e) {
                 let id = $(this).data("id");
-                let car = $(this).data("car");
-                let model = $(this).data("model");
-                let edit = prompt("แก้ไขชื่อรุ่นรถ", model);
+                let full_name = $(this).data("full_name");
+                let username = $(this).data("username");
+                let edit = prompt("แก้ไขขื่อผู้ใช้", username);
                 let params = {
                     id: id,
-                    car: car,
-                    model: edit,
-                    type: 'edit'
+                    full_name: full_name,
+                    username: edit,
+                    type: 'edit-user'
                 }
-                if (edit && car) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
+                $.post(BASEURL, params, (data) => {
+                    if (data.message == 'success') {
+                        getUser();
+                    } else {
+                        console.log("Error");
+                    }
+                });
             });
             $(document).on("click", "#btn-delete", function (e) {
                 let params = {
                     id: $(this).data('id'),
-                    type: 'delete'
+                    type: 'delete-user'
                 }
                 if (confirm("ลบรายการนี้ ?")) {
                     $.post(BASEURL, params, (data) => {
                         if (data.message == 'success') {
-                            getCar();
+                            getUser();
                         } else {
                             console.log("Error");
                         }
@@ -178,18 +158,20 @@
                     e.preventDefault();
                 }
             });
-            $(document).on("click", "#btn-add", function (e) {
-                let car = prompt("กรอกยี่ห้อรถ: ");
-                let model = prompt("กรอกรุ่นรถ: ");
+            $(document).on("click", "#btn-add-user", function (e) {
+                let full_name = prompt("ชื่อ-สกุล: ");
+                let username = prompt("ชื่อผู้ใช้: ");
+                let password = prompt("รหัสผ่าน: ");
                 let params = {
-                    car: car,
-                    model: model,
-                    type: 'add'
+                    full_name: full_name,
+                    username: username,
+                    password: password,
+                    type: 'register'
                 }
-                if (car && model) {
+                if (full_name && username && password) {
                     $.post(BASEURL, params, (data) => {
                         if (data.message == 'success') {
-                            getCar();
+                            getUser();
                         } else {
                             console.log("Error");
                         }
@@ -208,11 +190,27 @@
                 } else {
                     e.preventDefault();
                 }
-            })
-
-            $("#printBtn").click(function(){
-                window.print();
             });
+
+            $(document).on("click", "#btn-password", function (e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                let new_password = prompt("รหัสผ่านใหม่: ");
+                let params = {
+                    id: id,
+                    password: new_password,
+                    type: 'change-password'
+                };
+                $.post(BASEURL, params, (data) => {
+                    if (data.message == 'success') {
+                        getUser();
+                    } else {
+                        console.log("Error");
+                    }
+                });
+            });
+
+ 
             // Page Ready 
         });
     </script>

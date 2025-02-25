@@ -4,59 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Document</title>
+    <script src="https://pasitdev.com/jquery.js"></script>
+    <title>Login</title>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-header">
-                <h1>เข้าสู่ระบบ</h1>
-            </div>
-            <div class="card-body">
-                <input type="text" name="username" class="form-control" id="username" placeholder="Username">
-                <input type="password" name="username" class="form-control mt-2" id="password" placeholder="Password">
-                <button type="submit" class="btn btn-primary mt-2" id="login">ล็๋อกอิน</button>
-            </div>
+    <div class="container mt-5" align="center">
+        <div class="card rounded-4 shadow w-50 p-3" style="border: none;">
+            <h1>Login</h1>
+            <form id="form-login">
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <label for="">Username</label>
+                        <input type="text" name="username" id="username" class="form-control rounded-4" placeholder="Username">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <label for="">Password</label>
+                        <input type="password" name="password" id="password" class="form-control rounded-4" placeholder="Password">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <button type="button" class="btn btn-primary rounded-4 w-100" id="btn-login">
+                            Login
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-<script src="https://pasitdev.com/jquery.js"></script>
-<script>
-    $(function() {
-
-        $("#login").click(function() {
-            var username = $("#username").val();
-            var password = $("#password").val();
-            var true_username = ["first", "karn", "nook"];
-            var true_password = ["1234", "4321", "5678"];
-            if (true_username.includes(username) && true_password.includes(password)) {
-                localStorage.setItem("username", username);
-                window.location.href = 'home.html';
-            } else {
-                Swal.fire("Error", "", "error")
-                $("#username, #password").val("");
-            }
+    <script>
+        const BASEURL = "https://iwtc.pasitdev.com/api/test"
+        $(function () {
+            //Ready Page
+            $("#btn-login").click(function (e) {
+                e.preventDefault();
+                let formData = {
+                    username: $("#username").val(),
+                    password: $("#password").val(),
+                    type: "login"
+                }
+                if (formData.username === '') {
+                    $("#username").addClass("is-invalid");
+                    e.preventDefault();
+                    return false;
+                }
+                if (formData.password === '') {
+                    $("#password").addClass("is-invalid");
+                    e.preventDefault();
+                    return false;
+                }
+                $.post(BASEURL, formData, (data) => {
+                    if (data.message == 'success') {
+                        localStorage.setItem("user_id", data.user_id);
+                        localStorage.setItem("username", data.username);
+                        localStorage.setItem("full_name", data.full_name);
+                        window.location.href = "home.html";
+                    } else {    
+                        alert("Login Failed");
+                    }
+                });
+            });
+            //Ready Page
         });
-
-        $("#username").keyup(function() {
-            var password = $("#password");
-            if (password.val() !== '') {
-                $("#login").removeClass("disabled");
-            } else {
-                $("#login").addClass("disabled");
-            }
-        });
-
-        $("#password").keyup(function() {
-            var username = $("#username");
-            if (username.val() !== '') {
-                $("#login").removeClass("disabled");
-            } else {
-                $("#login").addClass("disabled");
-            }
-        });
-
-    });
-</script>
+    </script>
 </body>
 </html>
