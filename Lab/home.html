@@ -24,6 +24,11 @@
 </style>
 <div class="d-flex flex-row-reverse">
     <div class="p-2">
+        <a href="monitor.html" class="btn btn-warning rounded-4" target="_blank">
+            Realtime
+        </a>
+    </div>
+    <div class="p-2">
         <button id="printBtn" class="btn btn-primary rounded-4">
             <i class="bi bi-printer"></i> Print
         </button>
@@ -58,11 +63,19 @@
             </thead>
             <tbody id="car"></tbody>
         </table>
+        <hr>
+        <h3>รถทั้งหมด: <b id="total-car"></b> คัน</h3>
     </div>
 </div>
 <script src="https://pasitdev.com/jquery.js"></script>
 <script>
     $(function () {
+
+        function countCar() {
+            $.post("https://iwtc.pasitdev.com/api/test", {type: 'count'}, (data) => {
+                $("#total-car").text(data.data);
+            });
+        }
 
         function getCar() {
             $.post("https://iwtc.pasitdev.com/api/test", { type: 'get' }, (data) => {
@@ -85,7 +98,7 @@
             })
         }
         getCar();
-
+        countCar();
         $("#save").click(function (e) {
             var carname = $("#carname").val();
             var params = {

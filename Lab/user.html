@@ -6,7 +6,10 @@
 <div class="card p-4 rounded-4">
     <div class="row mb-2 justify-content-end">
         <div class="col-2">
-            <a href="register.html" id="btn-add" class="btn btn-warning w-100">เพิ่มผู้ใช้</a>
+            <a href="register.html" id="btn-add" class="btn btn-warning w-100">
+                <i class="fa-solid fa-plus"></i>
+                เพิ่มผู้ใช้
+            </a>
         </div>
     </div>
     <div class="row justify-content-end">
@@ -25,25 +28,17 @@
         </thead>
         <tbody id="user"></tbody>
     </table>
+    <hr>
+    <h3>จำนวนผู้ใช้ทั้งหมด: <b id="total-user"></b> คน</h3>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="baseModal" tabindex="-1" aria-labelledby="baseModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="baseModalLabel"></h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body"></div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
 <script src="https://pasitdev.com/jquery.js"></script>
 <script>
     $(function () {
+        function countUser() {
+            $.post("https://iwtc.pasitdev.com/api/test", {type: 'count-user'}, (data) => {
+                $("#total-user").text(data.data);
+            });
+        }
         function getUser() {
             $.post("https://iwtc.pasitdev.com/api/test", { type: 'get-user' }, (data) => {
                 $("#user").empty()
@@ -110,6 +105,7 @@
             });
         }
         getUser();
+        countUser();
         $(document).on("click", "#delete", function () {
             const id = $(this).data();
             const cf = confirm("Are you sure to delete user?");
@@ -163,7 +159,7 @@
                     data-id="${edit_data.id}"
                     data-full_name="${edit_data.full_name}"
                     data-username="${edit_data.username}"
-                    class="form-control"
+                    class="form-control rounded-4"
                     id="edit-full_name_2"
                     value="${edit_data.full_name}">
             `);
@@ -173,13 +169,13 @@
                     data-id="${edit_data.id}"
                     data-full_name="${edit_data.full_name}"
                     data-username="${edit_data.username}"
-                    class="form-control"
+                    class="form-control rounded-4"
                     id="edit-username_2"
                     value="${edit_data.username}">
             `);
             $(this).addClass("disabled");
         });
-        $(document).on("focusout", "#edit-full_name_2", function () {
+        $(document).on("change", "#edit-full_name_2", function () {
             var params = {
                 type: 'edit-user',
                 full_name: $(this).val(),
@@ -194,7 +190,7 @@
             });
 
         });
-        $(document).on("focusout", "#edit-username_2", function () {
+        $(document).on("change", "#edit-username_2", function () {
             var params = {
                 type: 'edit-user',
                 full_name: $(this).data("full_name"),
