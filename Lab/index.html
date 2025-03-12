@@ -3,71 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
-    <script src="https://pasitdev.com/jquery.js"></script>
-    <title>Login</title>
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-<body>
-    <div class="container mt-5" align="center">
-        <div class="card rounded-4 shadow w-50 p-3" style="border: none;">
-            <h1>Login</h1>
-            <form id="form-login">
-                <div class="row">
-                    <div class="col-md-12 col-lg-12 col-sm-12">
-                        <label for="">Username</label>
-                        <input type="text" name="username" id="username" class="form-control rounded-4" placeholder="Username">
-                    </div>
+<body class="bg-secondary">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="card text-center" style="width: 30rem;">
+                <div class="card-body">
+                    <h1>เข้าสู่ระบบ</h1>
+                    <input type="text" id="username" class="form-control rounded-4 mb-3" placeholder="Username">
+                    <input type="password" id="password" class="form-control rounded-4 mb-3" placeholder="Password">
+                    <button class="btn btn-primary w-100 rounded-4" id="login">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        ล็อกอิน
+                    </button>
+                    <button id="register" style="display: none;" class="btn btn-success w-100">สมัครสมาชิก</button>
                 </div>
-                <div class="row">
-                    <div class="col-md-12 col-lg-12 col-sm-12">
-                        <label for="">Password</label>
-                        <input type="password" name="password" id="password" class="form-control rounded-4" placeholder="Password">
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-12 col-lg-12 col-sm-12">
-                        <button type="button" class="btn btn-primary rounded-4 w-100" id="btn-login">
-                            Login
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
+    <script src="https://pasitdev.com/jquery.js"></script>
     <script>
-        const BASEURL = "https://iwtc.pasitdev.com/api/test"
-        $(function () {
-            //Ready Page
-            $("#btn-login").click(function (e) {
-                e.preventDefault();
-                let formData = {
+        $(function() {
+           $("#login").click(function() {
+            const params = {
+                    type: "login",
                     username: $("#username").val(),
-                    password: $("#password").val(),
-                    type: "login"
+                    password: $("#password").val()
                 }
-                if (formData.username === '') {
-                    $("#username").addClass("is-invalid");
-                    e.preventDefault();
-                    return false;
-                }
-                if (formData.password === '') {
-                    $("#password").addClass("is-invalid");
-                    e.preventDefault();
-                    return false;
-                }
-                $.post(BASEURL, formData, (data) => {
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+                $.post("https://iwtc.pasitdev.com/api/test", params, (data) => {
+                    console.log(data);
                     if (data.message == 'success') {
-                        localStorage.setItem("user_id", data.user_id);
-                        localStorage.setItem("username", data.username);
-                        localStorage.setItem("full_name", data.full_name);
-                        window.location.href = "home.html";
-                    } else {    
-                        alert("Login Failed");
+                        localStorage.setItem("username", data.username)
+                        localStorage.setItem("user_id", data.user_id)
+                        console.log(data)
+                        window.location.href = "menu.html";
+                    } else {
+                        alert("Username " + username + " or Password " + password + " is incorrect. Would you like to register now?");
+                        document.getElementById("register").style.display = "inline-block";
                     }
+                $("#username,#password").val("");  
                 });
-            });
-            //Ready Page
-        });
+           });
+           $("#register").click(function (e) {
+                window.location.href = "register.html";
+           });
+           $("#password").keypress(function (e) {
+                if (e.keyCode === 13) {
+                    $("#login").click();
+                }
+           });
+           
+        })
     </script>
 </body>
 </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+</head>
+
+<body class="bg-secondary">
+    <div class="container mt-5">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="card p-4 rounded-4" style="width: 30rem;">
+                <div class="card-body">
+                    <h1>สมัครสมาชิก</h1>
+                    <input type="text" id="name" class="form-control rounded-4 mb-3" placeholder="Full Name">
+                    <input type="text" id="username" class="form-control rounded-4 mb-3" placeholder="Username">
+                    <input type="text" id="password" class="form-control rounded-4 mb-3" placeholder="Password">
+                    <button class="btn btn-primary w-100" id="register">
+                        <i class="bi bi-box-arrow-in-right"></i> สมัครสมาชิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://pasitdev.com/jquery.js"></script>
+    <script>
+        $(function () {
+            $("#register").click(function () {
+                const params = {
+                    type: "register",
+                    full_name: $("#name").val(),
+                    username: $("#username").val(),
+                    password: $("#password").val()
+                }
+                $.post("https://iwtc.pasitdev.com/api/test", params, (data) => {
+                    if (data.message == 'success') {
+                        window.location.href = "menu.html";
+                    } else {
+                        alert("username หรือ password มีข้อมูลในระบบแล้ว ");
+                    }
+                });
+
+
+            })
+        })
+
+    </script>
+</body>
+
+</html>

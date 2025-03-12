@@ -1,221 +1,183 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
-    <script src="https://pasitdev.com/jquery.js"></script>
-    <script src="https://pasitdev.com/bootstrap.bundle.js"></script>
-    <title>Home Page</title>
-    <style>
-        td {
-            cursor: pointer;
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://pasitdev.com/jquery.js"></script>
+<style>
+    @media print {
+        body {
+            visibility: hidden;
         }
-    </style>
-    <style>
-        @media print {
-            body * {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
-            .table-reponsive, .table-reponsive * {
-                visibility: visible; /* แสดงเฉพาะตาราง */
-            }
-            .table-reponsive {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            #btn-delete {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
-            #th-delete {
-                visibility: hidden; /* ซ่อนทุกอย่าง */
-            }
-        }
-    </style>
-</head>
 
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">MyApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="home.html">รายการรถ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="user.html">จัดการผู้ใช้</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="btn-logout">ออกจากระบบ</a>
-                    </li>
-                </ul>
-            </div>
-            <form class="d-flex" role="search">
-                Username: &nbsp; <b id="login"></b>
-            </form>
+        .table-responsive {
+            visibility: visible;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .th-print {
+            display: none;
+        }
+    }
+</style>
+<div class="d-flex flex-row-reverse">
+    <div class="p-2">
+        <button id="printBtn" class="btn btn-primary rounded-4">
+            <i class="bi bi-printer"></i> Print
+        </button>
+    </div>
+    <div class="p-2">
+        <a href="print-car.html" class="btn btn-info rounded-4" target="_blank">
+            <i class="bi bi-printer"></i> Print New Window
+        </a>
+    </div>
+</div>
+<div class="card p-4 rounded-4">
+    <div class="row">
+        <div class="col-4">
+            <input type="text" placeholder="เพิ่มรถ" class="form-control " id="carname">
         </div>
-    </nav>
-    <div class="container mt-3">
-        <div class="row">
-            <div class="col">
-                <h1>แสดงข้อมูลรถ</h1>
-            </div>
-            <div class="col" align="right">
-                <button id="btn-add" class="btn btn-success">เพิ่มรถ</button>
-                <button id="printBtn" class="btn btn-primary">Print</button>
-            </div>
+        <div class="col">
+            <button id="save" class="btn btn-dark w-25 rounded-4"><i class="bi bi-folder-plus"></i> เพิ่มรถ</button>
         </div>
-        <hr>
-        <div class="table-reponsive">
-            <table class="table table-sm" width="100%">
-                <thead>
-                    <th>#</th>
-                    <th>ชื่อยี่ห้อ</th>
-                    <th>รุ่น</th>
-                    <th id="th-delete">ลบ</th>
-                </thead>
-                <tbody id="fetch_data"></tbody>
-            </table>
+        <div class="col-3" align="right">
+            <input type="text" id="txt-find" placeholder="ค้นหา" class="form-control rounded-4">
         </div>
     </div>
-    <script>
-        const BASEURL = "https://iwtc.pasitdev.com/api/test"
-        $(function () {
-            // Page Ready
-            $("#login").text(localStorage.getItem("full_name"))
-            function getCar () {
-                $.post(BASEURL, {type: 'get'}, (data) => {
-                    $("#fetch_data").empty();
-                    $.each(data.data, function (key, value) { 
-                         $("#fetch_data").append(`
-                            <tr>
-                                <td width="10%">${value.id}</td>    
-                                <td id="edit-car" data-id="${value.id}" data-car="${value.car}" data-model="${value.model}">
-                                    ${value.car}
-                                </td>    
-                                <td 
-                                    id="edit-model" 
-                                    data-id="${value.id}" 
-                                    data-car="${value.car}" 
-                                    data-model="${value.model}">
-                                    ${value.model || '-'}
-                                </td>    
-                                <td width="10%">
-                                    <button class="btn btn-outline-danger rounded-4" id="btn-delete" data-id="${value.id}">
-                                        ลบ    
-                                    </button>  
-                                </td>
-                            </tr>
-                         `);
-                    });
+    <div class="table-responsive">
+        <h1 id="header-print"></h1>
+        <table class="table table-sm table-hover w-100 text-center">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ชื่อรถ</th>
+                    <th class="th-print">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody id="car"></tbody>
+        </table>
+    </div>
+</div>
+<script src="https://pasitdev.com/jquery.js"></script>
+<script>
+    $(function () {
+
+        function getCar() {
+            $.post("https://iwtc.pasitdev.com/api/test", { type: 'get' }, (data) => {
+                $("#car").empty();
+                let i = 0;
+                $.each(data.data, function (k, v) {
+                    i++;
+                    $("#car").append(
+                        `
+                    <tr>
+                        <td width="10%">${i}</td>
+                        <td id="car-${v.id}" class="car-name">${v.car}</td>
+                        <td class="th-print" width="10%">
+                            <button class="btn btn-success rounded-4" data-id="${v.id}" data-car="${v.car}" id="btn-edit"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-danger rounded-4" data-id="${v.id}" id="btn-delete"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                `);
+                })
+            })
+        }
+        getCar();
+
+        $("#save").click(function (e) {
+            var carname = $("#carname").val();
+            var params = {
+                type: 'add',
+                car: carname
+            };
+            if (carname === '') {
+                $("#carname").addClass("is-invalid");
+                e.preventDefault();
+                return false;
+            }
+            $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                if (data.message == 'success') {
+                    getCar();
+                    $("#carname").addClass("is-valid");
+                    alert("บันทึกข้อมูลรถสำเร็จ!");
+                } else {
+                    alert("บันทึกข้อมูลรถไม่สำเร็จ!");
+                }
+            });
+            $("#carname").val("");
+        });
+        $(document).on("click", "#btn-delete", function () {
+            const id = $(this).data();
+            const cf = confirm("Are you sure to delete car?");
+            const params = {
+                type: 'delete',
+                id: id.id
+            }
+            if (cf) {
+                $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                    if (data.message == 'success') {
+                        getCar();
+                    } else {
+                        alert("ลบข้อมูลรถไม่สำเร็จ!");
+                    }
                 });
             }
-            getCar();
-            $(document).on("click", "#edit-car", function (e) {
-                let id = $(this).data("id");
-                let car = $(this).data("car");
-                let model = $(this).data("model");
-                let edit = prompt("แก้ไขชื่อรถ", car);
-                let params = {
-                    id: id,
-                    car: edit,
-                    model: model,
-                    type: 'edit'
-                }
-                if (edit && model) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
-            });
-            $(document).on("click", "#edit-model", function (e) {
-                let id = $(this).data("id");
-                let car = $(this).data("car");
-                let model = $(this).data("model");
-                let edit = prompt("แก้ไขชื่อรุ่นรถ", model);
-                let params = {
-                    id: id,
-                    car: car,
-                    model: edit,
-                    type: 'edit'
-                }
-                if (edit && car) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
-            });
-            $(document).on("click", "#btn-delete", function (e) {
-                let params = {
-                    id: $(this).data('id'),
-                    type: 'delete'
-                }
-                if (confirm("ลบรายการนี้ ?")) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                } else {
-                    e.preventDefault();
-                }
-            });
-            $(document).on("click", "#btn-add", function (e) {
-                let car = prompt("กรอกยี่ห้อรถ: ");
-                let model = prompt("กรอกรุ่นรถ: ");
-                let params = {
-                    car: car,
-                    model: model,
-                    type: 'add'
-                }
-                if (car && model) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getCar();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
-            });
-            $("#btn-logout").click(function(e) {
-                e.preventDefault();
-                if (confirm("ออกจากระบบ ?")) {
-                    localStorage.removeItem("user_id");
-                    localStorage.removeItem("username");
-                    localStorage.removeItem("full_name");
-                    setTimeout(() => {
-                        window.location.href = "index.html";
-                    }, 300);
-                } else {
-                    e.preventDefault();
-                }
-            })
-
-            $("#printBtn").click(function(){
-                window.print();
-            });
-            // Page Ready 
         });
-    </script>
-</body>
+        $(document).on("click", "#btn-edit", function () {
+            const id = $(this).data('id');
+            const carNameElement = $(`#car-${id}`);
+            const currentCarName = $(this).data('car');
 
-</html>
+            // สร้าง input สำหรับแก้ไข
+            const input = $(`<input type="text" class="form-control" value="${currentCarName}">`);
+            carNameElement.html(input);
+            input.focus();
+
+            // เมื่อ input หลุด focus หรือกด Enter ให้บันทึก
+            input.blur(function () {
+                saveCarName(id, input.val(), carNameElement);
+            }).keypress(function (event) {
+                if (event.which === 13) {
+                    saveCarName(id, input.val(), carNameElement);
+                }
+            });
+        });
+
+        function saveCarName(id, newCarName, carNameElement) {
+            const params = {
+                type: 'edit',
+                id: id,
+                car: newCarName
+            };
+            $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                if (data.message == 'success') {
+                    carNameElement.text(newCarName);
+                } else {
+                    carNameElement.text(carNameElement.find('input').val());
+                    alert("แก้ไขข้อมูลรถไม่สำเร็จ!");
+                }
+            }
+            );
+        }
+
+        $("#printBtn").click(function () {
+            $("#header-print").show();
+            $("#header-print").text("รายงานข้อมูลรถ");
+            window.print();
+        });
+
+        window.onafterprint = function () {
+            $("#header-print").hide();
+        };
+
+        $(document).on("keyup", "#txt-find", function (e) {
+            e.preventDefault();
+            let value = $(this).val().toLowerCase();
+            $("#car tr").filter(function () {
+                $(this).toggle($(this).find(".car-name").text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+</script>

@@ -1,219 +1,222 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://pasitdev.com/bootstrap.css">
-    <script src="https://pasitdev.com/jquery.js"></script>
-    <title>Home Page</title>
-    <style>
-        td {
-            cursor: pointer;
-        }
-    </style>
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">MyApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="home.html">รายการรถ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="user.html">จัดการผู้ใช้</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="btn-logout">ออกจากระบบ</a>
-                    </li>
-                </ul>
-            </div>
-            <form class="d-flex" role="search">
-                Username: &nbsp; <b id="login"></b>
-            </form>
-        </div>
-    </nav>
-    <div class="container mt-3">
-        <div class="row">
-            <div class="col">
-                <h1>แสดงข้อมูลรถ</h1>
-            </div>
-            <div class="col" align="right">
-                <button id="btn-add-user" class="btn btn-primary">เพิ่มผู้ใช้</button>
-            </div>
-        </div>
-        <hr>
-        <div class="table-reponsive">
-            <table class="table table-sm" width="100%">
-                <thead>
-                    <th>#</th>
-                    <th>ชื่อ-สกุล</th>
-                    <th>ชื่อผู้ใช้</th>
-                    <th id="th-delete">ลบ</th>
-                </thead>
-                <tbody id="fetch_data"></tbody>
-            </table>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="card p-4 rounded-4">
+    <div class="row mb-2 justify-content-end">
+        <div class="col-2">
+            <a href="register.html" id="btn-add" class="btn btn-warning w-100">เพิ่มผู้ใช้</a>
         </div>
     </div>
-    <script>
-        const BASEURL = "https://iwtc.pasitdev.com/api/test"
-        $(function () {
-            // Page Ready
-            $("#login").text(localStorage.getItem("full_name"))
-            function getUser () {
-                $.post(BASEURL, {type: 'get-user'}, (data) => {
-                    $("#fetch_data").empty();
-                    $.each(data.data, function (key, value) { 
-                         $("#fetch_data").append(`
-                            <tr>
-                                <td width="10%">${value.id}</td>    
-                                <td 
-                                    id="edit-full_name" 
-                                    data-id="${value.id}" 
-                                    data-full_name="${value.name}" 
-                                    data-username="${value.username}">
-                                    ${value.name}
-                                </td>    
-                                <td 
-                                    id="edit-username" 
-                                    data-id="${value.id}" 
-                                    data-full_name="${value.name}" 
-                                    data-username="${value.username}">
-                                    ${value.username}
-                                </td>    
-                                <td width="20%">
-                                    <button class="btn btn-outline-warning text-dark rounded-4" id="btn-password" data-id="${value.id}">
-                                        เปลี่ยนรหัสผ่าน    
-                                    </button>  
-                                    <button class="btn btn-outline-danger rounded-4" id="btn-delete" data-id="${value.id}">
-                                        ลบ    
-                                    </button>  
-                                </td>
-                            </tr>
-                         `);
-                    });
+    <div class="row justify-content-end">
+        <div class="col-3">
+            <input type="text" id="txt-find" placeholder="ค้นหา" class="form-control rounded-4">
+        </div>
+    </div>
+    <table class="table table-hover table-sm w-100 text-center">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody id="user"></tbody>
+    </table>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="baseModal" tabindex="-1" aria-labelledby="baseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="baseModalLabel"></h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="https://pasitdev.com/jquery.js"></script>
+<script>
+    $(function () {
+        function getUser() {
+            $.post("https://iwtc.pasitdev.com/api/test", { type: 'get-user' }, (data) => {
+                $("#user").empty()
+                var i = 0;
+                $.each(data.data, function (k, v) {
+                    var login_now = localStorage.getItem("username");
+                    var delete_button = ``;
+                    var changepassword = ``;
+                    var edit = ``;
+                    i++;
+                    if (v.username === login_now) {
+                        delete_button = `
+                        <button class="btn btn-danger disabled" id="delete" data-id="${v.id}"><i class="bi bi-trash-fill"></i></button>
+                        `;
+                        changepassword = `
+                        <button class="btn btn-primary" id="change" data-id="${v.id}"><i class="bi bi-unlock"></i></button>
+                        `;
+                        edit = `
+                        <button 
+                            class="btn btn-warning" 
+                            id="edit" 
+                            data-id="${v.id}"
+                            data-full_name="${v.name}"
+                            data-username="${v.username}"
+                            >
+                            <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        `;
+                    } else {
+                        delete_button = `  
+                        <button class="btn btn-danger"><i class="bi bi-trash-fill"></i></button>
+                        `;
+                        changepassword = `
+                        <button class="btn btn-primary disabled"><i class="bi bi-unlock"></i></button>
+                        `;
+                        edit = `
+                        <button 
+                            class="btn btn-warning disabled" 
+                            id="edit" >
+                            <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        `;
+                    }
+                    $("#user").append(
+                        `
+                        <tr>
+                            <td width="10%">${i}</td>   
+                            <td id="edit-full_name-${v.id}" data-id="${v.id}" data-full_name="${v.name}" data-username="${v.username}">
+                                ${v.name}
+                            </td>  
+                            <td id="edit-username-${v.id}" data-id="${v.id}" data-full_name="${v.name}" data-username="${v.username}" class="user-name">
+                                ${v.username}
+                            </td>   
+                            <td width="20%">
+                                ${changepassword}
+                                ${edit}
+                                ${delete_button}
+                            </td>
+                               
+                        </tr>
+                      `
+                    );
+                });
+            });
+        }
+        getUser();
+        $(document).on("click", "#delete", function () {
+            const id = $(this).data();
+            const cf = confirm("Are you sure to delete user?");
+            const params = {
+                type: 'delete-user',
+                id: id.id
+            }
+
+            if (cf) {
+                $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                    if (data.message == 'success') {
+                        getUser();
+                        alert("ลบข้อมูลสำเร็จ!");
+                    } else {
+                        alert("ลบข้อมูลไม่สำเร็จ!");
+                    }
                 });
             }
-            getUser();
-
-            $(document).on("click", "#edit-full_name", function (e) {
-                let id = $(this).data("id");
-                let full_name = $(this).data("full_name");
-                let username = $(this).data("username");
-                let edit = prompt("แก้ไขชื่อสกุล", full_name);
-                let params = {
-                    id: id,
-                    full_name: edit,
-                    username: username,
-                    type: 'edit-user'
-                }
-                $.post(BASEURL, params, (data) => {
-                    if (data.message == 'success') {
-                        getUser();
-                    } else {
-                        console.log("Error");
-                    }
-                });
-            });
-            $(document).on("click", "#edit-username", function (e) {
-                let id = $(this).data("id");
-                let full_name = $(this).data("full_name");
-                let username = $(this).data("username");
-                let edit = prompt("แก้ไขขื่อผู้ใช้", username);
-                let params = {
-                    id: id,
-                    full_name: full_name,
-                    username: edit,
-                    type: 'edit-user'
-                }
-                $.post(BASEURL, params, (data) => {
-                    if (data.message == 'success') {
-                        getUser();
-                    } else {
-                        console.log("Error");
-                    }
-                });
-            });
-            $(document).on("click", "#btn-delete", function (e) {
-                let params = {
-                    id: $(this).data('id'),
-                    type: 'delete-user'
-                }
-                if (confirm("ลบรายการนี้ ?")) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getUser();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                } else {
-                    e.preventDefault();
-                }
-            });
-            $(document).on("click", "#btn-add-user", function (e) {
-                let full_name = prompt("ชื่อ-สกุล: ");
-                let username = prompt("ชื่อผู้ใช้: ");
-                let password = prompt("รหัสผ่าน: ");
-                let params = {
-                    full_name: full_name,
-                    username: username,
-                    password: password,
-                    type: 'register'
-                }
-                if (full_name && username && password) {
-                    $.post(BASEURL, params, (data) => {
-                        if (data.message == 'success') {
-                            getUser();
-                        } else {
-                            console.log("Error");
-                        }
-                    });
-                }
-            });
-            $("#btn-logout").click(function(e) {
-                e.preventDefault();
-                if (confirm("ออกจากระบบ ?")) {
-                    localStorage.removeItem("user_id");
-                    localStorage.removeItem("username");
-                    localStorage.removeItem("full_name");
-                    setTimeout(() => {
-                        window.location.href = "index.html";
-                    }, 300);
-                } else {
-                    e.preventDefault();
-                }
-            });
-
-            $(document).on("click", "#btn-password", function (e) {
-                e.preventDefault();
-                let id = $(this).data('id');
-                let new_password = prompt("รหัสผ่านใหม่: ");
-                let params = {
-                    id: id,
-                    password: new_password,
-                    type: 'change-password'
-                };
-                $.post(BASEURL, params, (data) => {
-                    if (data.message == 'success') {
-                        getUser();
-                    } else {
-                        console.log("Error");
-                    }
-                });
-            });
-
- 
-            // Page Ready 
         });
-    </script>
-</body>
+        $(document).on("click", "#change", function (e) {
+            let new_pass1 = prompt("New Password: ");
+            if (new_pass1.length < 4) {
+                alert("รหัสต้องไม่น้อยกว่า 4 ตัว");
+                e.preventDefault();
+                return false;
+            }
+            let new_pass2 = prompt("Confirm Password: ");
+            if (new_pass1 !== new_pass2) {
+                alert("รหัสผ่านไม่ตรงกัน");
+                e.preventDefault();
+                return false;
+            }
+            let params = {
+                type: 'change-password',
+                password: new_pass2,
+                id: $(this).data('id')
+            };
+            $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                if (data.message == 'success') {
+                    getUser();
+                    Swal.fire("Success", "", "success");
+                }
+            });
+        })
 
-</html>
+        $(document).on("click", "#edit", function (e) {
+            var edit_data = $(this).data();
+            $(`#edit-full_name-${edit_data.id}`).html(`
+                <input 
+                    type="text"  
+                    data-id="${edit_data.id}"
+                    data-full_name="${edit_data.full_name}"
+                    data-username="${edit_data.username}"
+                    class="form-control"
+                    id="edit-full_name_2"
+                    value="${edit_data.full_name}">
+            `);
+            $(`#edit-username-${edit_data.id}`).html(`
+                <input 
+                    type="text" 
+                    data-id="${edit_data.id}"
+                    data-full_name="${edit_data.full_name}"
+                    data-username="${edit_data.username}"
+                    class="form-control"
+                    id="edit-username_2"
+                    value="${edit_data.username}">
+            `);
+            $(this).addClass("disabled");
+        });
+        $(document).on("focusout", "#edit-full_name_2", function () {
+            var params = {
+                type: 'edit-user',
+                full_name: $(this).val(),
+                username: $(this).data("username"),
+                id: $(this).data("id"),
+            }
+            $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                if (data.message == 'success') {
+                    location.reload();
+                }
+
+            });
+
+        });
+        $(document).on("focusout", "#edit-username_2", function () {
+            var params = {
+                type: 'edit-user',
+                full_name: $(this).data("full_name"),
+                username: $(this).val(),
+                id: $(this).data("id")
+            }
+            $.post("https://iwtc.pasitdev.com/api/test", params, function (data) {
+                if (data.message == 'success') {
+                    location.reload();
+                }
+
+            });
+
+        });
+
+        $(document).on("keyup", "#txt-find", function (e) {
+            e.preventDefault();
+            let value = $(this).val().toLowerCase();
+            $("#user tr").filter(function () {
+                $(this).toggle($(this).find(".user-name").text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+    });
+</script>
